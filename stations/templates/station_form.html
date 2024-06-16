@@ -1,33 +1,34 @@
-{% extend base.html %}
+{% extends "base.html" %}
 {% block body %}
 
-<body>
-    <h1>Create New Fuel Station</h1>
+<h1>ایجاد ایستگاه جدید</h1>
     <form method="post">
         {% csrf_token %}
         {{ form.as_p }}
         
-        <h2>Gasoline Nozzles</h2>
+        <h2>نازل‌های بنزین</h2>
         <div id="gasoline_nozzle_formset">
-            <!-- Forms for Gasoline Nozzles will be added here dynamically -->
+            <!-- فرم‌های نازل‌های بنزین به صورت دینامیک اضافه خواهند شد -->
         </div>
+        <h3 id="gasoline_total">مجموع بنزین: 0</h3>
         
-        <h2>Gas Nozzles</h2>
+        <h2>نازل‌های گاز</h2>
         <div id="gas_nozzle_formset">
-            <!-- Forms for Gas Nozzles will be added here dynamically -->
+            <!-- فرم‌های نازل‌های گاز به صورت دینامیک اضافه خواهند شد -->
         </div>
-        
-        <h2>Gasoline Tanks</h2>
+        <h3 id="gas_total">مجموع گاز: 0</h3>
+
+        <h2>مخازن بنزین</h2>
         <div id="gasoline_tank_formset">
-            <!-- Forms for Gasoline Tanks will be added here dynamically -->
+            <!-- فرم‌های مخازن بنزین به صورت دینامیک اضافه خواهند شد -->
         </div>
-        
-        <h2>Gas Tanks</h2>
+
+        <h2>مخازن گاز</h2>
         <div id="gas_tank_formset">
-            <!-- Forms for Gas Tanks will be added here dynamically -->
+            <!-- فرم‌های مخازن گاز به صورت دینامیک اضافه خواهند شد -->
         </div>
-        
-        <button type="submit">Save</button>
+
+        <button type="submit">ذخیره</button>
     </form>
-    <a href="{% url 'station_list' %}">Back to List</a>
+    <a href="{% url 'station_list' %}">بازگشت به لیست</a>
 {% endblock %}

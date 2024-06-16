@@ -11,8 +11,11 @@
         <li>
             <a href="{% url 'station_detail' station.id %}">{{ station.name }}</a> - 
             <a href="{% url 'generate_pdf' station.id %}">Generate PDF</a>
+            <a href="{% url 'generate_pdf_reportlab' station.pk %}">generate_pdf_reportlab PDF</a>
+
         </li>
         {% endfor %}
     </ul>
 </body>
 </html>
+generate_pdf_reportlab
