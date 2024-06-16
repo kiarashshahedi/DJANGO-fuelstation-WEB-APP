@@ -1,4 +1,4 @@
-import io
+from io import BytesIO
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
@@ -191,6 +191,10 @@ def reshape_text(text):
 def generate_pdf_reportlab(request, pk):
     station = FuelStation.objects.get(pk=pk)
     
+    # Fetch control period dates
+    start_date = station.start_date if station.control_period == 'start' else None
+    end_date = station.end_date if station.control_period == 'end' else None
+    
     # محاسبه فروش کل بنزین
     total_gasoline_sales = sum([
         abs(nozzle.totalizer_end - nozzle.totalizer_start) 
@@ -215,7 +219,6 @@ def generate_pdf_reportlab(request, pk):
     total_gasoline_removed = abs((gasoline_initial_stock + gasoline_received) - gasoline_final_stock)
     total_gas_removed = abs((gas_initial_stock + gas_received) - gas_final_stock)
     
-    
     # محاسبه کسری یا سرک
     gasoline_deficit = total_gasoline_removed - total_gasoline_sales
     gas_deficit = total_gas_removed - total_gas_sales
@@ -228,7 +231,10 @@ def generate_pdf_reportlab(request, pk):
         else:
             unauthorized_deficit = 0
     
-    buffer = io.BytesIO()
+    # محاسبه اختلاف فروش مکانیکال و الکترونیکی
+    mechanical_electronic_sales_diff = station.gasoline_electronic_sales - total_gasoline_sales
+    
+    buffer = BytesIO()
     doc = SimpleDocTemplate(buffer, pagesize=A4)
     styles = getSampleStyleSheet()
     
@@ -242,6 +248,7 @@ def generate_pdf_reportlab(request, pk):
     
     elements = []
     
+    # نمایش اطلاعات جایگاه سوخت
     elements.append(Paragraph(reshape_text(f'اسم جایگاه: {station.name}'), styles['Title']))
     elements.append(Spacer(1, 12))
     
@@ -251,6 +258,7 @@ def generate_pdf_reportlab(request, pk):
     elements.append(Paragraph(reshape_text(f'تعداد مخازن گاز: {station.gas_tanks}'), styles['Normal']))
     elements.append(Spacer(1, 12))
     
+    # نمایش مقادیر محاسباتی
     elements.append(Paragraph(reshape_text(f'فروش کل بنزین: {total_gasoline_sales} لیتر'), styles['Normal']))
     elements.append(Paragraph(reshape_text(f'فروش کل گاز: {total_gas_sales} لیتر'), styles['Normal']))
     elements.append(Spacer(1, 12))
@@ -269,7 +277,11 @@ def generate_pdf_reportlab(request, pk):
         elements.append(Paragraph(reshape_text(f'سرک گاز: {abs(gas_deficit)} لیتر'), styles['Normal']))
     else:
         elements.append(Paragraph(reshape_text(f'کسری گاز: {gas_deficit} لیتر'), styles['Normal']))
-
+    
+    # نمایش اختلاف فروش مکانیکال و الکترونیکی
+    elements.append(Spacer(1, 12))
+    elements.append(Paragraph(reshape_text(f'اختلاف فروش مکانیکال و الکترونیکی بنزین: {mechanical_electronic_sales_diff} لیتر'), styles['Normal']))
+    
     # نمایش کسری غیرمجاز
     if unauthorized_deficit is not None:
         elements.append(Spacer(1, 12))
@@ -277,6 +289,30 @@ def generate_pdf_reportlab(request, pk):
             elements.append(Paragraph(reshape_text(f'کسری غیرمجاز: {unauthorized_deficit} لیتر'), styles['Normal']))
         else:
             elements.append(Paragraph(reshape_text(f'کسری غیرمجاز: ۰ لیتر'), styles['Normal']))
+    
+    # اضافه کردن اطلاعات اضافی از کاربر به فایل PDF
+    elements.append(Spacer(1, 12))
+    elements.append(Paragraph(reshape_text('اطلاعات اضافی از کاربر:'), styles['Title']))
+    
+    additional_info = [
+        ('موجودی اول دوره بنزین:', f'{gasoline_initial_stock}'),
+        ('مقدار رسیده دوره بنزین:', f'{gasoline_received}'),
+        ('موجودی انتهای دوره بنزین:', f'{gasoline_final_stock}'),
+        ('موجودی اول دوره گاز:', f'{gas_initial_stock}'),
+        ('مقدار رسیده دوره گاز:', f'{gas_received}'),
+        ('موجودی انتهای دوره گاز:', f'{gas_final_stock}'),
+    ]
+    
+    for info in additional_info:
+        elements.append(Paragraph(reshape_text(f'{info[0]} {info[1]}'), styles['Normal']))
+    
+    # نمایش دوره کنترل
+    elements.append(Spacer(1, 12))
+    elements.append(Paragraph(reshape_text('دوره کنترل:'), styles['Title']))
+    if start_date:
+        elements.append(Paragraph(reshape_text(f'از تاریخ: {start_date}'), styles['Normal']))
+    if end_date:
+        elements.append(Paragraph(reshape_text(f'تا تاریخ: {end_date}'), styles['Normal']))
     
     doc.build(elements)
     buffer.seek(0)
