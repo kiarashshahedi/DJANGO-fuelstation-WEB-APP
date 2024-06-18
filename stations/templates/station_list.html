@@ -1,21 +1,28 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Fuel Stations</title>
-</head>
-<body>
-    <h1>Fuel Stations</h1>
-    <a href="{% url 'create_station' %}">Create New Station</a>
-    <ul>
-        {% for station in stations %}
-        <li>
-            <a href="{% url 'station_detail' station.id %}">{{ station.name }}</a> - 
-            <a href="{% url 'generate_pdf' station.id %}">Generate PDF</a>
-            <a href="{% url 'generate_pdf_reportlab' station.pk %}">generate_pdf_reportlab PDF</a>
+{% extends "base.html" %}
+{% block body %}
 
-        </li>
+<div class="container mt-4">
+    <h2 class="text-center mb-4">فایل‌های پی‌دی‌اف</h2>
+
+    <div class="row">
+        {% for station in stations %}
+        <div class="col-md-6 mb-3">
+            <div class="card shadow-sm">
+                <div class="card-body text-center">
+                    
+
+                  <p>
+
+                      <a class="card-title " href="{% url 'station_detail' station.id %}">{{ station.name }}</a> 
+                  </p> 
+                    <a class="btn btn-primary btn-custom" href="{% url 'generate_pdf' station.id %}">Generate PDF</a>
+                    <a class="btn btn-secondary btn-custom" href="{% url 'generate_pdf_reportlab' station.pk %}">generate_pdf_reportlab PDF</a>
+        
+                </div>
+            </div>
+        </div>
         {% endfor %}
-    </ul>
-</body>
-</html>
-generate_pdf_reportlab
+    </div>
+</div>
+
+{% endblock %}

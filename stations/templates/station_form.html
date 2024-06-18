@@ -1,34 +1,231 @@
 {% extends "base.html" %}
 {% block body %}
 
-<h1>ایجاد ایستگاه جدید</h1>
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
+<div class="container mt-4">
+    <p class="text-center">لطفا یکی از موارد زیر انتخاب کنید</p>
+    
+    <div class="row border-bottom pb-3 mb-3">
+
+        <div class="col-4">
+            <button id="showGas" class="btn btn-outline-danger w-100">گاز</button>
+        </div>
+
+        <div class="col-4">
+            <button id="showGasoiil" class="btn btn-outline-warning w-100">گازوییل</button>
+        </div>
+
+        <div class="col-4">
+            <button id="showAll" class="btn btn-outline-secondary w-100">هر دو</button>
+        </div>
+
+    </div>
+
+    <form method="post" class="mt-3">
+    {% csrf_token %}
+        <!-- form fields -->
+
+        <!-- .......................infos of station..................... -->
+
+        <div class="form-group">
+            <label for="id_name">نام</label>
+            <input type="text" class="form-control" id="id_name" name="name">
+        </div>
+
+        <div class="form-group">
+            <label for="id_name">دوره کنترل</label>
+            <input type="text" class="form-control" id="id_control_period" name="control_period">
+        </div>
+
+        <div class="form-group">
+            <label for="id_name"> تاریخ شروع </label>
+            <input type="text" class="form-control" id="id_start_date" name="start_date">
+        </div>
+
+        <div class="form-group">
+            <label for="id_name"> تاریخ پایان </label>
+            <input type="text" class="form-control" id="id_end_date" name="end_date">
+        </div>
+
+        <div class="form-group">
+            <label for="id_name"> نوع محصول </label>
+            <input type="text" class="form-control" id="id_product_type" name="product_type">
+        </div>
+
+
+
+
+        <!--   .......................... BENZIN fiels ........................  -->
+        <div class="GazoiilShow">
+
+            <div class="form-group ">
+                <label for="id_gasoline_tanks"> تعداد مخازن بنزین </label>
+                <input type="number" class="form-control " id="id_gasoline_tanks" name="gasoline_tanks">
+            </div>
+
+            <div class="form-group">
+                <label for="id_gasoline_nozzles"> تعداد نازل‌های بنزین </label>
+                <input type="number" class="form-control" id="id_gasoline_nozzles" name="gasoline_nozzles">
+            </div>
+
+            <div class="form-group">
+                <label for="id_gasoline_nozzles"> موجودی اولیه بنزین </label>
+                <input type="number" class="form-control" id="id_gasoline_initial_stock" name="gasoline_initial_stock">
+            </div>
+
+            <div class="form-group">
+                <label for="id_gasoline_nozzles"> بنزین دریافتی </label>
+                <input type="number" class="form-control" id="id_gasoline_received" name="gasoline_received">
+            </div>
+
+            <div class="form-group">
+                <label for="id_gasoline_nozzles"> فروش الکترونیکی بنزین </label>
+                <input type="number" class="form-control" id="id_gasoline_electronic_sales" name="gasoline_electronic_sales">
+            </div>
+
+            <div class="form-group">
+                <label for="id_gasoline_nozzles"> فروش الکترونیکی سامانه بنزین </label>
+                <input type="number" class="form-control" id="id_gasoline_electronic_samane_sales" name="gasoline_electronic_samane_sales">
+            </div>
+
+
+            <!-- Gasoline Tanks fields -->
+            <h2 class="section-title">Gasoline Tanks</h2>
+            <div id="gasoline_tank_formset">
+
+                {% for form in gasoline_tank_formset %}
+
+                <div class="form-row">
+
+                    <div class="form-group col-md-6">
+                        {{ form.tank_number.label_tag }} {{ form.tank_number }}
+                    </div>
+
+                    <div class="form-group col-md-6">
+                        {{ form.final_stock.label_tag }} {{ form.final_stock }}
+                    </div>
+                    
+                </div>
+                {% endfor %}
+            </div>
+
+
+
+            <!-- Benzin nozzles fields-->
+            <div id="gasoline_nozzle_formset">
+
+                {% for form in gasoline_nozzle_formset %}
+                <div class="form-row">
+
+                    <div class="form-group col-md-4">
+                        {{ form.nozzle_number.label_tag }} {{ form.nozzle_number }}
+                    </div>
+
+                    <div class="form-group col-md-4">
+                        {{ form.totalizer_start.label_tag }} {{ form.totalizer_start }}
+                    </div>
+
+                    <div class="form-group col-md-4">
+                        {{ form.totalizer_end.label_tag }} {{ form.totalizer_end }}
+                    </div>
+
+                </div>
+                {% endfor %}
+
+            </div>
+
+        </div>
+
+
+
+
+        <!--   ............................GAZ fields........................  -->
+
+        <div class="GazShow">
+
+            <div class="form-group">
+                <label for="id_gas_tanks"> تعداد مخازن گاز </label>
+                <input type="number" class="form-control " id="id_gas_tanks" name="gas_tanks">
+            </div>
+
+            <div class="form-group">
+                <label for="id_gas_nozzles"> تعداد نازل‌های گاز </label>
+                <input type="number" class="form-control " id="id_gas_nozzles" name="gas_nozzles">
+            </div>
+
+            <div class="form-group">
+                <label for="id_gas_nozzles"> موجودی اولیه گاز </label>
+                <input type="number" class="form-control " id="id_gas_initial_stock" name="gas_initial_stock">
+            </div>
+
+            <div class="form-group">
+                <label for="id_gas_nozzles"> گاز دریافتی </label>
+                <input type="number" class="form-control " id="id_gas_received" name="gas_received">
+            </div>
+
+            <div class="form-group">
+                <label for="id_gas_nozzles"> فروش الکترونیکی گازوئیل </label>
+                <input type="number" class="form-control " id="id_diesel_electronic_sales" name="diesel_electronic_sales">
+            </div>
+
+            <div class="form-group">
+                <label for="id_gas_nozzles"> فروش الکترونیکی سامانه گازوئیل </label>
+                <input type="number" class="form-control " id="id_diesel_electronic_samane_sales" name="diesel_electronic_samane_sales">
+            </div>
+                    
+
+            <!-- Gas Tanks  -->
+            <h2 class="section-title">Gas Tanks</h2>
+            <div id="gas_tank_formset">
+                {% for form in gas_tank_formset %}
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                    {{ form.tank_number.label_tag }} {{ form.tank_number }}
+                    </div>
+                    <div class="form-group col-md-6">
+                    {{ form.final_stock.label_tag }} {{ form.final_stock }}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+
+
+            <!-- Gaz nozzles -->
+            <h2 class="section-title"> نازل‌های گاز</h2>
+            <div id="gas_nozzle_formset" class="GazShow">
+                <!-- Gas Nozzles fields -->
+                {% for form in gas_nozzle_formset %}
+                <div class="form-row">
+                    <div class="form-group col-md-4">
+                    {{ form.nozzle_number.label_tag }} {{ form.nozzle_number }}
+                    </div>
+                    <div class="form-group col-md-4">
+                    {{ form.totalizer_start.label_tag }} {{ form.totalizer_start }}
+                    </div>
+                    <div class="form-group col-md-4">
+                    {{ form.totalizer_end.label_tag }} {{ form.totalizer_end }}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
         
-        <h2>نازل‌های بنزین</h2>
-        <div id="gasoline_nozzle_formset">
-            <!-- فرم‌های نازل‌های بنزین به صورت دینامیک اضافه خواهند شد -->
-        </div>
-        <h3 id="gasoline_total">مجموع بنزین: 0</h3>
+
+
+
         
-        <h2>نازل‌های گاز</h2>
-        <div id="gas_nozzle_formset">
-            <!-- فرم‌های نازل‌های گاز به صورت دینامیک اضافه خواهند شد -->
-        </div>
-        <h3 id="gas_total">مجموع گاز: 0</h3>
 
-        <h2>مخازن بنزین</h2>
-        <div id="gasoline_tank_formset">
-            <!-- فرم‌های مخازن بنزین به صورت دینامیک اضافه خواهند شد -->
-        </div>
 
-        <h2>مخازن گاز</h2>
-        <div id="gas_tank_formset">
-            <!-- فرم‌های مخازن گاز به صورت دینامیک اضافه خواهند شد -->
-        </div>
+        
 
-        <button type="submit">ذخیره</button>
+
+
+        
+        
+
+        <button class="btn btn-success w-100 mb-5" type="submit">تمام و تایید</button>
     </form>
-    <a href="{% url 'station_list' %}">بازگشت به لیست</a>
+</div>
+
 {% endblock %}
