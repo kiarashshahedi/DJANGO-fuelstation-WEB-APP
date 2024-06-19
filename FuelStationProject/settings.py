@@ -28,7 +28,10 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'stations',
     'crispy_forms',
-    'crispy_bootstrap4',  
+    'crispy_bootstrap4', 
+    'rest_framework',
+    
+ 
 
 
 ]
@@ -123,6 +126,7 @@ STATIC_URL = '/static/'
 # مسیر برای فایل‌های استاتیک در حالت توسعه
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "static"),
+
 ]
 
 # مسیر برای فایل‌های استاتیک جمع‌آوری شده (در حالت تولید)
@@ -130,3 +134,14 @@ STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
+
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
+}

@@ -1,25 +1,20 @@
 from io import BytesIO
 from reportlab.lib.pagesizes import A4
-from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.pdfbase import pdfmetrics
 from reportlab.lib.fonts import addMapping
 import arabic_reshaper
 from bidi.algorithm import get_display
-
-
-
-
 from django.shortcuts import render, redirect
-from django.shortcuts import get_object_or_404
-
 from .forms import FuelStationForm, GasolineNozzleFormSet, GasNozzleFormSet
 from .models import FuelStation, GasolineNozzle, GasNozzle, GasolineTank, GasTank
 from django.http import HttpResponse
-from django.template.loader import get_template
-from xhtml2pdf import pisa
 from .calculations import calculate_gasoline_total_volume, calculate_gas_total_volume
+import os
+from django.conf import settings
+
 
 def create_station(request):
     if request.method == 'POST':
@@ -141,48 +136,8 @@ def station_detail(request, pk):
     gas_nozzles = station.gas_nozzles_details.all()
     return render(request, 'station_detail.html', {'station': station, 'gasoline_nozzles': gasoline_nozzles, 'gas_nozzles': gas_nozzles})
 
-import os
-from django.conf import settings
 
-def generate_pdf(request, pk):
-    station = get_object_or_404(FuelStation, pk=pk)
-
-    # محاسبات نهایی برای نازل‌های بنزین
-    gasoline_nozzles = station.gasoline_nozzles_details.all()
-    gasoline_total = sum([(nozzle.totalizer_end - nozzle.totalizer_start) for nozzle in gasoline_nozzles])
-
-    # محاسبات نهایی برای نازل‌های گاز
-    gas_nozzles = station.gas_nozzles_details.all()
-    gas_total = sum([(nozzle.totalizer_end - nozzle.totalizer_start) for nozzle in gas_nozzles])
-
-    # محاسبه‌ی جدید: حذف کامل محصول از ایستگاه
-    gasoline_entire_product_removed = (station.gasoline_initial_stock or 0) + (station.gasoline_received or 0) - (station.gasoline_final_stock or 0)
-
-    template_path = 'station_pdf.html'
-    context = {
-        'station': station,
-        'gasoline_total': gasoline_total,
-        'gas_total': gas_total,
-        'gasoline_entire_product_removed': gasoline_entire_product_removed,
-    }
-    response = HttpResponse(content_type='application/pdf')
-    response['Content-Disposition'] = f'attachment; filename="station_{station.id}.pdf"'
-    template = get_template(template_path)
-    html = template.render(context)
-    
-    # تنظیمات فونت
-    font_path = os.path.join(settings.BASE_DIR, 'static/fonts/Vazir.ttf')
-    pisa_status = pisa.CreatePDF(
-        html, dest=response,
-        encoding='UTF-8',
-        link_callback=lambda uri, rel: font_path if uri == 'static/fonts/Vazir.ttf' else uri
-    )
-
-    if pisa_status.err:
-        return HttpResponse('We had some errors <pre>' + html + '</pre>')
-    return response
-
-
+# for generating infos as a PDF file
 def reshape_text(text):
     reshaped_text = arabic_reshaper.reshape(text)    # shape the text
     bidi_text = get_display(reshaped_text)           # correct its direction
@@ -318,3 +273,8 @@ def generate_pdf_reportlab(request, pk):
     buffer.seek(0)
     
     return HttpResponse(buffer, content_type='application/pdf')
+
+
+
+
+
