@@ -32,6 +32,7 @@ class FuelStation(models.Model):
     diesel_electronic_sales = models.PositiveIntegerField('مقدار فروش الکترونیکی گاز',null=True, blank=True)  # مقدار فروش الکترونیکی گاز
     
     gas_final_stock = models.FloatField('موجودی انتهای دوره گاز',null=True, blank=True) # موجودی انتهای دوره گاز
+    last_modified = models.DateTimeField(auto_now=True)  # Add this field for App RELEASE
 
     def __str__(self):
         return self.name

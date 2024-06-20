@@ -15,7 +15,6 @@
 
                       <a class="card-title " href="{% url 'station_detail' station.id %}">{{ station.name }}</a> 
                   </p> 
-                    <a class="btn btn-primary btn-custom" href="{% url 'generate_pdf' station.id %}">Generate PDF</a>
                     <a class="btn btn-secondary btn-custom" href="{% url 'generate_pdf_reportlab' station.pk %}">generate_pdf_reportlab PDF</a>
         
                 </div>
